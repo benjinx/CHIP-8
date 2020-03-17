@@ -29,12 +29,6 @@ typedef struct
         };
         uint16_t raw;
     };
-} instructions;
-
-
-//void __LD_Vx_Vy()
-//{
-//    V[x] = v[y];
-//}
+} instruction;
 
 #endif // CPU_H
