@@ -3,35 +3,32 @@
 #include "cpu.h"
 #include "log.h"
 #include "registers.h"
+#include "mmu.h"
+#include "video.h"
 
 #include <SDL.h>
 
 // argc = number of arguments, argv = the arguments
 int main(int argc, char* argv[])
 {
+    if (argc > 1)
+    {
+        LoadROM(argv[1]);
+    }
 
-    // Error check for too many arguments or too few
-    //if (argc < 2)
-    //{
-    //    LogError("No filename specified.\n");
-    //    return 1;
-    //}
-    //else if (argc > 2)
-    //{
-    //    LogError("Too many arguments.\n");
-    //    return 1;
-    //}
+    PC = 0x200;
+
     SDL_Init(SDL_INIT_EVERYTHING);
 
     SDL_Window* window;
-    int SCALE = 3;
+    int SCALE = 10;
 
     window = SDL_CreateWindow(
         "CHIP-8",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        160 * SCALE,
-        144 * SCALE,
+        WIDTH * SCALE,
+        HEIGHT * SCALE,
         0);
 
     SDL_Renderer* r = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
@@ -48,23 +45,21 @@ int main(int argc, char* argv[])
     int pitch = 0;
     SDL_LockTexture(tex, NULL, (void**)&pixels, &pitch);
 
-    for (unsigned y = 0; y < 144; ++y) {
-        for (unsigned x = 0; x < 160; ++x) {
-            unsigned off = (y * 256 * 3) + (x * 3);
+    for (unsigned y = 0; y < HEIGHT; ++y) {
+        for (unsigned x = 0; x < WIDTH; ++x) {
+            unsigned off = (y * pitch) + (x * 3);
             pixels[off + 0] = 0xFF; // R
-            pixels[off + 1] = 0x00; // G
-            pixels[off + 2] = 0x00; // B
+            pixels[off + 1] = 0xFF; // G
+            pixels[off + 2] = 0xFF; // B
         }
     }
 
     SDL_UnlockTexture(tex);
-
-
-
+    
     // Rect
     
-    SDL_Rect src = { .x = 0, .y = 0, .w = 160, .h = 144 };
-    SDL_Rect dst = { .x = 0, .y = 0, .w = 160 * SCALE, .h = 144 * SCALE, };
+    SDL_Rect src = { .x = 0, .y = 0, .w = WIDTH, .h = HEIGHT };
+    SDL_Rect dst = { .x = 0, .y = 0, .w = WIDTH * SCALE, .h = HEIGHT * SCALE, };
 
     SDL_Event ev;
 
@@ -77,6 +72,29 @@ int main(int argc, char* argv[])
                 exit(0);
             }
         }
+
+        for (int i = 0; i < 1000; ++i)
+        {
+            for (int v = 0; v < 16; ++v) {
+                printf("V[%d] = %02X ", v, V[v]);
+            }
+            printf("\n");
+            execute(fetch());
+        }
+        return;
+
+        SDL_LockTexture(tex, NULL, (void**)&pixels, &pitch);
+
+        for (unsigned y = 0; y < HEIGHT; ++y) {
+            for (unsigned x = 0; x < WIDTH; ++x) {
+                unsigned off = (y * pitch) + (x * 3);
+                pixels[off + 0] = VRAM[y][x]; // R
+                pixels[off + 1] = VRAM[y][x]; // G
+                pixels[off + 2] = VRAM[y][x]; // B
+            }
+        }
+
+        SDL_UnlockTexture(tex);
         
         //SDL_RenderClear(r);
         SDL_RenderCopy(r, tex, &src, &dst);
