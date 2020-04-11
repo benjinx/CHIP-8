@@ -317,7 +317,7 @@ instruction fetch()
     instruction inst = {
         .raw = (read_byte(PC) << 8) | read_byte(PC + 1),
     };
-    printf("[%03X] OP=%X AAA=%03X X=%X Y=%X KK=%02X\n", PC, inst.opcode, inst.addr, inst.x, inst.y, inst.kk);
+    //printf("[%03X] OP=%X AAA=%03X X=%X Y=%X KK=%02X\n", PC, inst.opcode, inst.addr, inst.x, inst.y, inst.kk);
     PC += 2;
     return inst;
 }

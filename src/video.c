@@ -1,3 +1,3 @@
 #include "video.h"
 
-uint8_t VRAM[WIDTH][HEIGHT];
+uint8_t VRAM[HEIGHT][WIDTH];

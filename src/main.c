@@ -73,15 +73,10 @@ int main(int argc, char* argv[])
             }
         }
 
-        for (int i = 0; i < 1000; ++i)
+        for (int i = 0; i < 16; ++i)
         {
-            for (int v = 0; v < 16; ++v) {
-                printf("V[%d] = %02X ", v, V[v]);
-            }
-            printf("\n");
             execute(fetch());
         }
-        return;
 
         SDL_LockTexture(tex, NULL, (void**)&pixels, &pitch);
 
